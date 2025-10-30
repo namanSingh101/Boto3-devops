@@ -3,10 +3,10 @@ import json
 from botocore.exceptions import ClientError
 
 #define bucket name and region
-bucket_name = "demo-boto3-bucket-105"
-region = "ap-south-1"
+bucket_name = "bucket_name(unique)"
+region = "region"
 
-session = boto3.Session(profile_name="terraform")
+session = boto3.Session(profile_name="aws_cli_profile")
 s3_client = session.client("s3",region_name=region)
 sts = session.client('sts')
 
