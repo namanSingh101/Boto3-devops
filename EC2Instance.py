@@ -6,12 +6,12 @@ import subprocess
 import socket
 import time
 
-region="ap-south-1"
-profile="terraform"
-ami_id="ami-0f918f7e67a3323f0"
-key_name="key_mumbai_region"
-subnet_id="subnet-0371715cc6e1eaed7"
-sg_id="sg-05a15917a59257cc2"
+region="region"
+profile="profile"
+ami_id="ami-0f918f7e67a3323f0"     #ubuntu ami 
+key_name="key_pair"
+subnet_id="subnet_id"
+sg_id="security_group"
 bash_script="./start_server.sh"
 
 session=boto3.Session(profile_name=profile,region_name=region)

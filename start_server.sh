@@ -4,7 +4,7 @@ set -eou pipefail
 
 EC2_ip=$1
 PLATFORM=ubuntu
-FILE=~/Downloads/key_mumbai_region.pem
+FILE=location_pem_file
 
 chmod 400 $FILE
 
