@@ -12,7 +12,7 @@ subnet_id="subnet-0371715cc6e1eaed7"
 sg_id="sg-05a15917a59257cc2"
 bash_script="./start_server.sh"
 
-session=boto3.Session(profile_name=profile)
+session=boto3.Session(profile_name=profile,region_name=region)
 sts=session.client("sts")
 ec2=session.client("ec2")
 
@@ -23,8 +23,8 @@ print(f"Bucket will be created by IAM entity: {iam_user_arn}")
 def create_instance(profile_name,subnet_id,sg_id,ami_id):
     try:
         print("Launching ec2 instance ...")
-        instances=ec2.create_instance(
-            ImageId=ami_id,
+        instances=ec2.create_instances(
+        ImageId=ami_id,
         InstanceType="t2.micro",
         KeyName=key_name,
         MinCount=1,
