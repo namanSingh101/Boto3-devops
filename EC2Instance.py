@@ -3,6 +3,8 @@ import json
 from botocore.exceptions import ClientError
 import sys
 import subprocess
+import socket
+import time
 
 region="ap-south-1"
 profile="terraform"
@@ -13,8 +15,8 @@ sg_id="sg-05a15917a59257cc2"
 bash_script="./start_server.sh"
 
 session=boto3.Session(profile_name=profile,region_name=region)
-sts=session.client("sts")
-ec2=session.client("ec2")
+sts = session.client("sts")
+ec2 = session.resource("ec2")
 
 identity=sts.get_caller_identity()
 iam_user_arn = identity['Arn']
@@ -40,14 +42,14 @@ def create_instance(profile_name,subnet_id,sg_id,ami_id):
         "Tags": [{"Key": "Name", "Value": "boto3-jenkins-instance"}]
     }]
         )
-        instance=instance[0]
-        instance_id=instances[0].id
+        instance=instances[0]
+        instance_id=instance.id
         print(f"EC2 Instance {instance_id} created . Waitng for running the EC2")
 
         instance.wait_until_running()
         instance.reload()
 
-
+        print(f"EC2 Instance IP address {instance.public_ip_address} created")
         return instance.public_ip_address
     except ClientError as e:
         print(f"[ERROR] {e}")
@@ -60,7 +62,24 @@ def shell_script(public_ip):
     except Exception as e:
         raise e
     
+def wait_for_ssh(ip, port=22, timeout=300):
+    print("Waiting for SSH to become available...")
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(5)
+        try:
+            sock.connect((ip, port))
+            sock.close()
+            print("✅ SSH is now reachable!")
+            return True
+        except Exception:
+            print(".", end="", flush=True)
+            time.sleep(5)
+    raise TimeoutError("SSH not reachable within timeout period")
+
 
 if __name__=="__main__":
     public_ip=create_instance(profile,subnet_id,sg_id,ami_id)
+    wait_for_ssh(public_ip)
     shell_script(public_ip)
