@@ -39,8 +39,8 @@ def create_instance(subnet_id,sg_id,ami_id):
     }],
         BlockDeviceMappings=[
             {
-                'DeviceName': '/dev/sda1',
-                'Ebs': {
+                'DeviceName': '/dev/xya1', #change it 
+                 'Ebs': {
                     'VolumeSize': 15,   # 15 GB
                     'VolumeType': 'gp3',
                     'DeleteOnTermination': True
