@@ -22,7 +22,7 @@ identity=sts.get_caller_identity()
 iam_user_arn = identity['Arn']
 print(f"Bucket will be created by IAM entity: {iam_user_arn}")
 
-def create_instance(profile_name,subnet_id,sg_id,ami_id):
+def create_instance(subnet_id,sg_id,ami_id):
     try:
         print("Launching ec2 instance ...")
         instances=ec2.create_instances(
@@ -37,6 +37,16 @@ def create_instance(profile_name,subnet_id,sg_id,ami_id):
         "AssociatePublicIpAddress": True,
         "Groups": [sg_id]
     }],
+        BlockDeviceMappings=[
+            {
+                'DeviceName': '/dev/sda1',
+                'Ebs': {
+                    'VolumeSize': 15,   # 15 GB
+                    'VolumeType': 'gp3',
+                    'DeleteOnTermination': True
+                }
+            }
+        ],
     TagSpecifications=[{
         "ResourceType": "instance",
         "Tags": [{"Key": "Name", "Value": "boto3-jenkins-instance"}]
@@ -80,6 +90,6 @@ def wait_for_ssh(ip, port=22, timeout=300):
 
 
 if __name__=="__main__":
-    public_ip=create_instance(profile,subnet_id,sg_id,ami_id)
+    public_ip=create_instance(subnet_id,sg_id,ami_id)
     wait_for_ssh(public_ip)
     shell_script(public_ip)
